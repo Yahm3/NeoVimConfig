@@ -366,7 +366,7 @@ create_ant_project() {
 	cat <<EOF >src/main/java/App.java
 public class App {
 	/*
-	 * @author INNOCENT-ops806
+	 * @author Yahm3 
 	 */	
 	public static void main(String[] args) {
 		System.out.println("Hello from Ant project: $project_name!");
@@ -634,7 +634,7 @@ create_gradle_project() {
 	popd || exit # Back to $project_root_dir
 
 	# --- Generate a run.sh script for convenience ---
-	echo "Creating 'run.sh' script... 📜"
+	echo "Creating 'run.sh' script... "
 	cat <<EOF >run.sh
 #!/bin/bash
 # Builds and runs the Gradle application.
