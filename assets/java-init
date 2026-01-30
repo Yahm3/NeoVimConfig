@@ -11,9 +11,9 @@ DEFAULT_JAVA_VERSION="25" # Or your preferred LTS version
 
 # Function to create a run.sh script for Ant (Simplified)
 create_ant_run_script() {
-	local project_dir=$1
-	local project_name=$2
-	cat <<EOF >"$project_dir/run.sh"
+  local project_dir=$1
+  local project_name=$2
+  cat <<EOF >"$project_dir/run.sh"
 #!/bin/bash
 #
 # This script builds and runs the Ant project: $project_name
@@ -31,14 +31,14 @@ if [ \$? -ne 0 ]; then
 	exit 1
 fi
 EOF
-	chmod +x "$project_dir/run.sh"
+chmod +x "$project_dir/run.sh"
 }
 
 # Function to create a README.md for Ant
 create_ant_readme() {
-	local project_dir=$1
-	local project_name=$2
-	cat <<EOF >"$project_dir/README.md"
+  local project_dir=$1
+  local project_name=$2
+  cat <<EOF >"$project_dir/README.md"
 # $project_name (Ant Project)
 
 This is a simple Java project built with Apache Ant.
@@ -82,9 +82,9 @@ EOF
 
 # Function to create a run.sh script for Maven
 create_maven_run_script() {
-	local project_dir=$1
-	local project_name=$2
-	cat <<EOF >"$project_dir/run.sh"
+  local project_dir=$1
+  local project_name=$2
+  cat <<EOF >"$project_dir/run.sh"
 #!/bin/bash
 #
 # This script builds and runs the Maven project: $project_name
@@ -103,14 +103,14 @@ if [ \$? -ne 0 ]; then
     exit 1
 fi
 EOF
-	chmod +x "$project_dir/run.sh"
+chmod +x "$project_dir/run.sh"
 }
 
 # Function to create a README.md for Maven
 create_maven_readme() {
-	local project_dir=$1
-	local project_name=$2
-	cat <<EOF >"$project_dir/README.md"
+  local project_dir=$1
+  local project_name=$2
+  cat <<EOF >"$project_dir/README.md"
 # $project_name (Maven Project)
 
 This is a simple Java project built with Apache Maven.
@@ -159,43 +159,43 @@ EOF
 # --- Project Creation Functions ---
 
 create_maven_project() {
-	local project_name=$1
-	local group_id=$2
-	local artifact_id=$3
-	local version=$4
-	local java_version=$5
+  local project_name=$1
+  local group_id=$2
+  local artifact_id=$3
+  local version=$4
+  local java_version=$5
 
-	echo "Building Maven project: '$project_name'..."
-	# ... (Display project variables) ...
+  echo "Building Maven project: '$project_name'..."
+  # ... (Display project variables) ...
 
-	local original_invoke_dir=$(pwd)
-	local project_root_dir="${original_invoke_dir}/${artifact_id}"
+  local original_invoke_dir=$(pwd)
+  local project_root_dir="${original_invoke_dir}/${artifact_id}"
 
-	mkdir -p "$project_root_dir"
-	pushd "$project_root_dir" || {
-		echo "Failed to enter project directory: $project_root_dir. Exiting."
-		exit 1
-	}
+  mkdir -p "$project_root_dir"
+  pushd "$project_root_dir" || {
+    echo "Failed to enter project directory: $project_root_dir. Exiting."
+      exit 1
+  }
 
-	# Create source directories
-	local base_java_path="src/main/java/$(echo "$group_id" | sed 's/\./\//g')"
-	local base_test_path="src/test/java/$(echo "$group_id" | sed 's/\./\//g')"
-	mkdir -p "$base_java_path"
-	mkdir -p "$base_test_path"
+  # Create source directories
+  local base_java_path="src/main/java/$(echo "$group_id" | sed 's/\./\//g')"
+  local base_test_path="src/test/java/$(echo "$group_id" | sed 's/\./\//g')"
+  mkdir -p "$base_java_path"
+  mkdir -p "$base_test_path"
 
-	# Create App.java
-	cat <<EOF >"$base_java_path/App.java"
+  # Create App.java
+  cat <<EOF >"$base_java_path/App.java"
 package ${group_id};
 
 public class App {
     public static void main(String[] args) {
-        System.out.println("Hello from Maven project: ${artifact_id}!");
+	System.out.println("Hello from Maven project: ${artifact_id}!");
     }
 }
 EOF
 
-	# Create JUnit 5 test file (including Mockito import for setup)
-	cat <<EOF >"$base_test_path/AppTest.java"
+# Create JUnit 5 test file (including Mockito import for setup)
+cat <<EOF >"$base_test_path/AppTest.java"
 package ${group_id};
 
 import org.junit.jupiter.api.Test;
@@ -205,16 +205,16 @@ import static org.mockito.Mockito.*; // For Mockito
 class AppTest {
     @Test
     void shouldAnswerWithTrue() {
-        assertTrue(true);
+	assertTrue(true);
     }
 }
 EOF
 
-	# Create the pom.xml file with JUnit 5 and Mockito setup
-	cat <<EOF >pom.xml
+# Create the pom.xml file with JUnit 5 and Mockito setup
+cat <<EOF >pom.xml
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>${group_id}</groupId>
@@ -223,10 +223,10 @@ EOF
     <name>${project_name}</name>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>${java_version}</maven.compiler.release>
-        <junit.jupiter.version>5.10.0</junit.jupiter.version>
-        <mockito.version>5.10.0</mockito.version>
+	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<maven.compiler.release>${java_version}</maven.compiler.release>
+	<junit.jupiter.version>5.10.0</junit.jupiter.version>
+	<mockito.version>5.10.0</mockito.version>
     </properties>
 
     <dependencies>
@@ -245,127 +245,131 @@ EOF
 	<dependency>
 	    <groupId>org.junit.jupiter</groupId>
 	    <artifactId>junit-jupiter-engine</artifactId>
-            <version>\${junit.jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>\${mockito.version}</version>
-            <scope>test</scope>
-        </dependency>
+	    <version>\${junit.jupiter.version}</version>
+	    <scope>test</scope>
+	</dependency>
+
+	<dependency>
+	    <groupId>org.mockito</groupId>
+	    <artifactId>mockito-core</artifactId>
+	    <version>\${mockito.version}</version>
+	    <scope>test</scope>
+	</dependency>
     </dependencies>
 
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
-            		<configuration>
-          			<release>\${maven.compiler.release}</release>
-        				</configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <mainClass>${group_id}.App</mainClass>
-                </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>${group_id}.App</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
+	<plugins>
+	    <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-compiler-plugin</artifactId>
+		<version>3.13.0</version>
+			<configuration>
+				<release>\${maven.compiler.release}</release>
+					</configuration>
+	    </plugin>
+
+	    <plugin>
+		<groupId>org.codehaus.mojo</groupId>
+		<artifactId>exec-maven-plugin</artifactId>
+		<version>3.1.0</version>
+		<configuration>
+		    <mainClass>${group_id}.App</mainClass>
+		</configuration>
+	    </plugin>
+
+	    <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-jar-plugin</artifactId>
+		<version>3.3.0</version>
+		<configuration>
+		    <archive>
+			<manifest>
+			    <addClasspath>true</addClasspath>
+			    <classpathPrefix>lib/</classpathPrefix>
+			    <mainClass>${group_id}.App</mainClass>
+			</manifest>
+		    </archive>
+		</configuration>
+	    </plugin>
 						<plugin>
-        				<groupId>org.apache.maven.plugins</groupId>
-        				<artifactId>maven-shade-plugin</artifactId>
-        <version>3.5.1</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <shadedArtifactAttached>true</shadedArtifactAttached>
-              <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
-              <transformers>
-                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                  <mainClass>${group_id}.App</mainClass>
-                </transformer>
-              </transformers>
-              <filters>
-                <filter>
-                  <artifact>*:*</artifact>
-                  <excludes>
-                    <exclude>META-INF/*.SF</exclude>
-                    <exclude>META-INF/*.DSA</exclude>
-                    <exclude>META-INF/*.RSA</exclude>
-                  </excludes>
-                </filter>
-              </filters>
-            </configuration>
-     		     </execution>
-   		     </executions>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+	<version>3.5.1</version>
+	<executions>
+	  <execution>
+	    <phase>package</phase>
+	    <goals>
+	      <goal>shade</goal>
+	    </goals>
+	    <configuration>
+	      <shadedArtifactAttached>true</shadedArtifactAttached>
+	      <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
+	      <transformers>
+		<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+		  <mainClass>${group_id}.App</mainClass>
+		</transformer>
+	      </transformers>
+	      <filters>
+		<filter>
+		  <artifact>*:*</artifact>
+		  <excludes>
+		    <exclude>META-INF/*.SF</exclude>
+		    <exclude>META-INF/*.DSA</exclude>
+		    <exclude>META-INF/*.RSA</exclude>
+		  </excludes>
+		</filter>
+	      </filters>
+	    </configuration>
+		     </execution>
+		     </executions>
 		      </plugin>
-        	<plugin>
-        		<groupId>org.apache.maven.plugins</groupId>
-        		<artifactId>maven-surefire-plugin</artifactId>
-        		<version>3.2.5</version>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-surefire-plugin</artifactId>
+			<version>3.2.5</version>
 		      </plugin>
-        </plugins>
+	</plugins>
     </build>
 </project>
 EOF
 
-	# Create run.sh and README.md
-	create_maven_run_script "$(pwd)" "$project_name"
-	create_maven_readme "$(pwd)" "$project_name"
+# Create run.sh and README.md
+create_maven_run_script "$(pwd)" "$project_name"
+create_maven_readme "$(pwd)" "$project_name"
 
-	popd || exit
+popd || exit
 
-	echo -e "\nMaven project '$project_name' created successfully!"
-	echo "Happy coding!"
+echo -e "\nMaven project '$project_name' created successfully!"
+echo "Happy coding!"
 }
 
 create_ant_project() {
-	local project_name=$1
-	local group_id=$2
-	local artifact_id=$3
-	local version=$4
-	local java_version=$5 # Java version from user input
+  local project_name=$1
+  local group_id=$2
+  local artifact_id=$3
+  local version=$4
+  local java_version=$5 
 
-	echo "Building Ant project: '$project_name'..."
+  # --- NEW: Ask for Ivy ---
+  echo -n "Do you want to include Apache Ivy for dependency management? (y/n): "
+  read -r USE_IVY
 
-	mkdir -p "$project_name"
-	pushd "$project_name" || {
-		echo "Failed to enter project directory. Exiting."
-		exit 1
-	}
+  echo "Building Ant project: '$project_name'..."
 
-	mkdir -p src/main/java
-	mkdir -p src/test/java
-	mkdir -p lib # For manually managed JARs
+  mkdir -p "$project_name"
+  pushd "$project_name" || {
+    echo "Failed to enter project directory. Exiting."
+      exit 1
+  }
 
-	# Create a simple App.java
-	cat <<EOF >src/main/java/App.java
+mkdir -p src/main/java
+mkdir -p src/test/java
+mkdir -p lib 
+
+# Create a simple App.java
+cat <<EOF >src/main/java/App.java
 public class App {
-	/*
+	/**
 	 * @author Yahm3 
 	 */	
 	public static void main(String[] args) {
@@ -374,13 +378,17 @@ public class App {
 }
 EOF
 
-	# Create a basic build.xml
-	# NOTE: Changed release version to 25 based on industry standard.
-	cat <<EOF >build.xml
-<project xmlns:ivy="antlib:org.apache.ivy.ant" name="$project_name" default="dist" basedir=".">
-	<description>
-		Simple Ant build script for $project_name
-	</description>
+# --- NEW: Conditional Ivy Logic ---
+local IVY_XML_NAMESPACE=""
+local IVY_TARGETS_BLOCK=""
+local COMPILE_DEPENDS="init"
+local ECLIPSE_DEPENDS="init"
+
+if [[ "$USE_IVY" =~ ^[Yy]$ ]]; then
+  IVY_XML_NAMESPACE='xmlns:ivy="antlib:org.apache.ivy.ant"'
+  COMPILE_DEPENDS="init, resolve"
+  ECLIPSE_DEPENDS="resolve"
+  IVY_TARGETS_BLOCK=$(cat <<EOF
 	<property name="ivy.install.version" value="2.5.2"/>
 	<condition property="ivy.home" value="\${env.IVY_HOME}">
 	    <isset property="env.IVY_HOME"/>
@@ -388,24 +396,36 @@ EOF
 	<property name="ivy.home" value="\${user.home}/.ant"/>
 	<property name="ivy.jar.dir" value="\${ivy.home}/lib"/>
 	<property name="ivy.jar.file" value="\${ivy.jar.dir}/ivy.jar"/>
-    
+
     <target name="download-ivy" unless="offline">
-        <mkdir dir="\${ivy.jar.dir}"/>
-        <get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/\${ivy.install.version}/ivy-\${ivy.install.version}.jar"
+	<mkdir dir="\${ivy.jar.dir}"/>
+	<get src="https://repo1.maven.org/maven2/org/apache/ivy/ivy/\${ivy.install.version}/ivy-\${ivy.install.version}.jar"
 	    dest="\${ivy.jar.file}" usetimestamp="true"/>
     </target>
 
     <target name="init-ivy" depends="download-ivy">
-        <path id="ivy.lib.path">
-            <fileset dir="\${ivy.jar.dir}" includes="*.jar"/>
-        </path>
-        <taskdef resource="org/apache/ivy/ant/antlib.xml"
-        uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+	<path id="ivy.lib.path">
+	    <fileset dir="\${ivy.jar.dir}" includes="*.jar"/>
+	</path>
+	<taskdef resource="org/apache/ivy/ant/antlib.xml"
+	uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
     </target>
 
     <target name="resolve" depends="init, init-ivy" description="retrieve dependencies with ivy">
-        <ivy:retrieve pattern="lib/[artifact]-[revision](-[classifier]).[ext]"/>
+	<ivy:retrieve pattern="lib/[artifact]-[revision](-[classifier]).[ext]"/>
     </target>
+EOF
+)
+fi
+
+# Create build.xml
+cat <<EOF >build.xml
+<project $IVY_XML_NAMESPACE name="$project_name" default="dist" basedir=".">
+	<description>
+		Simple Ant build script for $project_name
+	</description>
+
+$IVY_TARGETS_BLOCK
 
 	<property environment="env"/> 
 	<property name="src.dir" location="src/main/java"/>
@@ -413,10 +433,10 @@ EOF
 	<property name="dist.dir"  location="dist"/>
 	<property name="lib.dir"  location="lib"/>
 	<property name="main.class" value="App"/>
-	<property name="java.version" value="\$[java_version]}"/>
-	
+	<property name="java.version" value="$java_version"/>
+
 	<path id="project.classpath">
-		<fileset dir="\${lib.dir}">
+		<fileset dir="\${lib.dir}" erroronmissingdir="false">
 			<include name="**/*.jar"/>
 		</fileset>
 	</path>
@@ -427,10 +447,9 @@ EOF
 		<mkdir dir="\${lib.dir}"/>
 	</target>
 
-	<target name="compile" depends="init, resolve" description="compile the source ">
+	<target name="compile" depends="$COMPILE_DEPENDS" description="compile the source ">
 		<javac srcdir="\${src.dir}" destdir="\${build.dir}" includeantruntime="false"
-			   release="25" fork="true"
-			   executable="\${env.JAVA_HOME}/bin/javac">
+			   release="\${java.version}" fork="true">
 			<classpath refid="project.classpath"/>
 		</javac>
 	</target>
@@ -440,7 +459,7 @@ EOF
 			<manifest>
 				<attribute name="Main-Class" value="\${main.class}"/>
 			</manifest>
-			<zipgroupfileset dir="\${lib.dir}" includes="*.jar"/>
+			<zipgroupfileset dir="\${lib.dir}" includes="*.jar" erroronmissingdir="false"/>
 			</jar>
 	</target>
 
@@ -453,48 +472,45 @@ EOF
 		</java>
 	</target>
 
-<target name="eclipse" depends="resolve" description="Generate Eclipse/LSP project files">
-    <echo message="Generating .project and .classpath for LSP..."/>
+<target name="eclipse" depends="$ECLIPSE_DEPENDS" description="Generate Eclipse/LSP project files">
+	<echo message="Generating .project and .classpath for LSP..."/>
 
-    <echo file=".project"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
-			<projectDescription>
-    		<name>\${ant.project.name}</name>
-    		<comment></comment>
-    		<projects></projects>
-    		<buildSpec>
-        	<buildCommand>
-            <name>org.eclipse.jdt.core.javabuilder</name>
-            <arguments></arguments>
-        	</buildCommand>
-    		</buildSpec>
-    		<natures>
-        	<nature>org.eclipse.jdt.core.javanature</nature>
-    		</natures>
-		</projectDescription>]]></echo>
+	<echo file=".project"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>\${ant.project.name}</name>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
+</projectDescription>]]></echo>
 
-    <echo file=".classpath"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
-			<classpath>
-    		<classpathentry kind="src" path="src/main/java"/>
-    		<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-    		<classpathentry kind="output" path="build"/>
-				]]></echo>
+	<echo file=".classpath"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="build"/>
+]]></echo>
 
-      <pathconvert property="eclipse.libs" pathsep="\${line.separator}">
-        <fileset dir="\${lib.dir}">
-          <include name="*.jar"/>
-        </fileset>
-        <mapper>
-          <chainedmapper>
-            <flattenmapper/>
-            <globmapper from="*" to="    &lt;classpathentry kind=&quot;lib&quot; path=&quot;lib/*&quot;/&gt;"/>
-          </chainedmapper>
-        </mapper>
-      	</pathconvert>
+	<pathconvert property="eclipse.libs" pathsep="\${line.separator}">
+		<fileset dir="\${lib.dir}" erroronmissingdir="false">
+			<include name="*.jar"/>
+		</fileset>
+		<mapper>
+			<chainedmapper>
+				<flattenmapper/>
+				<globmapper from="*" to="    &lt;classpathentry kind=&quot;lib&quot; path=&quot;lib/*&quot;/&gt;"/>
+			</chainedmapper>
+		</mapper>
+	</pathconvert>
 
-     		<echo file=".classpath" append="true">\${eclipse.libs}</echo>
-   		  <echo file=".classpath" append="true"><![CDATA[
-			</classpath>]]></echo>
-	</target>
+	<echo file=".classpath" append="true">\${eclipse.libs}</echo>
+	<echo file=".classpath" append="true"><![CDATA[
+</classpath>]]></echo>
+</target>
 
 	<target name="clean" description="clean up">
 		<delete dir="\${build.dir}"/>
@@ -504,149 +520,146 @@ EOF
 </project>
 EOF
 
-	create_ant_run_script "$(pwd)" "$project_name"
-	create_ant_readme "$(pwd)" "$project_name"
+create_ant_run_script "$(pwd)" "$project_name"
+create_ant_readme "$(pwd)" "$project_name"
 
-	popd || exit
-	echo -e "\nAnt project '$project_name' created successfully!"
-	echo "Navigate to '$project_name'."
-	echo "To build and run: './run.sh'"
-	echo "Happy coding! "
+popd || exit
+echo -e "\nAnt project '$project_name' created successfully (Ivy: ${USE_IVY:-n})!"
 }
 
 create_gradle_project() {
-	local project_name="$1"
-	local group_id="$2"
-	local artifact_id="$3"
-	local java_version="$4"
+  local project_name="$1"
+  local group_id="$2"
+  local artifact_id="$3"
+  local java_version="$4"
 
-	# --- Argument Validation ---
-	if [ -z "$project_name" ] || [ -z "$group_id" ] || [ -z "$artifact_id" ] || [ -z "$java_version" ]; then
-		echo "Error: All arguments (project_name, group_id, artifact_id, java_version) are required."
-		echo "Usage: create_gradle_project \"Project Name\" \"com.example.package\" \"artifact-id\" \"25\""
-		return 1
-	fi
+  # --- Argument Validation ---
+  if [ -z "$project_name" ] || [ -z "$group_id" ] || [ -z "$artifact_id" ] || [ -z "$java_version" ]; then
+    echo "Error: All arguments (project_name, group_id, artifact_id, java_version) are required."
+    echo "Usage: create_gradle_project \"Project Name\" \"com.example.package\" \"artifact-id\" \"25\""
+    return 1
+  fi
 
-	echo "🚀 Building Gradle project: '$project_name'..."
-	echo "  Group ID: $group_id"
-	echo "  Artifact ID: $artifact_id"
-	echo "  Java Version: $java_version"
+  echo "🚀 Building Gradle project: '$project_name'..."
+  echo "  Group ID: $group_id"
+  echo "  Artifact ID: $artifact_id"
+  echo "  Java Version: $java_version"
 
-	local original_invoke_dir=$(pwd)
-	local project_root_dir="${original_invoke_dir}/${artifact_id}"
-	local app_sub_dir="app" # The subdirectory where the application's build.gradle will be
+  local original_invoke_dir=$(pwd)
+  local project_root_dir="${original_invoke_dir}/${artifact_id}"
+  local app_sub_dir="app" # The subdirectory where the application's build.gradle will be
 
-	if [ -d "$project_root_dir" ]; then
-		echo "Error: Project directory '$project_root_dir' already exists. Aborting. ❌"
-		return 1
-	fi
+  if [ -d "$project_root_dir" ]; then
+    echo "Error: Project directory '$project_root_dir' already exists. Aborting. ❌"
+    return 1
+  fi
 
-	echo "Creating project directory: '$project_root_dir'..."
-	mkdir -p "$project_root_dir" || {
-		echo "Error: Failed to create project directory '$project_root_dir'. ❌"
-		return 1
-	}
-	pushd "$project_root_dir" || {
-		echo "Error: Failed to enter project directory '$project_root_dir'. ❌"
-		return 1
-	}
+  echo "Creating project directory: '$project_root_dir'..."
+  mkdir -p "$project_root_dir" || {
+    echo "Error: Failed to create project directory '$project_root_dir'. ❌"
+      return 1
+  }
+pushd "$project_root_dir" || {
+  echo "Error: Failed to enter project directory '$project_root_dir'. ❌"
+  return 1
+}
 
-	echo "Running 'gradle init' to scaffold the project... (Piping inputs for non-interactive mode)"
+echo "Running 'gradle init' to scaffold the project... (Piping inputs for non-interactive mode)"
 
-	(
-		echo "1"
-		echo "y"
-	) | gradle init \
-		--type java-application \
-		--dsl groovy \
-		--test-framework junit-jupiter \
-		--package "$group_id" \
-		--project-name "$artifact_id" \
-		--java-version "$java_version"
+(
+  echo "1"
+  echo "y"
+  ) | gradle init \
+    --type java-application \
+    --dsl groovy \
+    --test-framework junit-jupiter \
+    --package "$group_id" \
+    --project-name "$artifact_id" \
+    --java-version "$java_version"
 
-	if [ $? -ne 0 ]; then
-		echo "Error: 'gradle init' failed to generate the project. Cleaning up. ❌"
-		popd || exit
-		rm -rf "$project_root_dir"
-		return 1
-	fi
+  if [ $? -ne 0 ]; then
+    echo "Error: 'gradle init' failed to generate the project. Cleaning up. ❌"
+    popd || exit
+    rm -rf "$project_root_dir"
+    return 1
+  fi
 
-	echo "--- Files created by 'gradle init' in $(pwd): ---"
-	ls -F
-	echo "-------------------------------------"
+  echo "--- Files created by 'gradle init' in $(pwd): ---"
+  ls -F
+  echo "-------------------------------------"
 
-	# --- change into the 'app' subdirectory to modify its build.gradle ---
-	echo "Navigating to '$app_sub_dir' directory to customize 'build.gradle'..."
-	pushd "$app_sub_dir" || {
-		echo "Critical Error: '$app_sub_dir' subdirectory not found. This is unexpected. ❌"
-		popd || exit # Pop from project_root_dir
-		rm -rf "$project_root_dir"
-		return 1
-	}
+  # --- change into the 'app' subdirectory to modify its build.gradle ---
+  echo "Navigating to '$app_sub_dir' directory to customize 'build.gradle'..."
+  pushd "$app_sub_dir" || {
+    echo "Critical Error: '$app_sub_dir' subdirectory not found. This is unexpected. ❌"
+      popd || exit # Pop from project_root_dir
+      rm -rf "$project_root_dir"
+      return 1
+  }
 
-	local BUILD_GRADLE="build.gradle"
-	local APP_JAVA_PATH="src/main/java/$(echo "$group_id" | sed 's/\./\//g')/App.java"
-	local APP_TEST_PATH="src/test/java/$(echo "$group_id" | sed 's/\./\//g')/AppTest.java" # This path is relative to app/
+local BUILD_GRADLE="build.gradle"
+local APP_JAVA_PATH="src/main/java/$(echo "$group_id" | sed 's/\./\//g')/App.java"
+local APP_TEST_PATH="src/test/java/$(echo "$group_id" | sed 's/\./\//g')/AppTest.java" # This path is relative to app/
 
-	# --- Check for build.gradle AFTER init in the 'app' subdir ---
-	if [ ! -f "$BUILD_GRADLE" ]; then
-		echo "Critical Error: '$BUILD_GRADLE' not found in '$(pwd)' after successful 'gradle init'. This is unexpected. ❌"
-		popd || exit # Pop from app/
-		popd || exit # Pop from project_root_dir
-		rm -rf "$project_root_dir"
-		return 1
-	fi
+# --- Check for build.gradle AFTER init in the 'app' subdir ---
+if [ ! -f "$BUILD_GRADLE" ]; then
+  echo "Critical Error: '$BUILD_GRADLE' not found in '$(pwd)' after successful 'gradle init'. This is unexpected. ❌"
+  popd || exit # Pop from app/
+  popd || exit # Pop from project_root_dir
+  rm -rf "$project_root_dir"
+  return 1
+fi
 
-	echo "Customizing 'build.gradle' for Mockito and application plugin configuration... 🛠️"
-	# --- Modify build.gradle ---
-	if [ -f "$BUILD_GRADLE" ]; then
-		# 1. Add Mockito dependency (using latest stable Mockito 5.x)
-		sed -i "/testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'/a\ \ \ \ testImplementation 'org.mockito:mockito-core:5.10.0'" "$BUILD_GRADLE"
-		echo "  - Added Mockito dependency."
+echo "Customizing 'build.gradle' for Mockito and application plugin configuration... 🛠️"
+# --- Modify build.gradle ---
+if [ -f "$BUILD_GRADLE" ]; then
+  # 1. Add Mockito dependency (using latest stable Mockito 5.x)
+  sed -i "/testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'/a\ \ \ \ testImplementation 'org.mockito:mockito-core:5.10.0'" "$BUILD_GRADLE"
+  echo "  - Added Mockito dependency."
 
-		#  Ensure application plugin is configured with mainClass
-		if grep -q "mainClass =" "$BUILD_GRADLE"; then
-			sed -i "s|mainClass = '.*'|mainClass = '${group_id}.App'|" "$BUILD_GRADLE"
-			echo "  - Updated 'mainClass' for application plugin."
-		else
-			sed -i "/^application {/a\ \ \ \ mainClass = '${group_id}.App'" "$BUILD_GRADLE"
-			echo "  - Added 'mainClass' for application plugin (fallback)."
-		fi
+  #  Ensure application plugin is configured with mainClass
+  if grep -q "mainClass =" "$BUILD_GRADLE"; then
+    sed -i "s|mainClass = '.*'|mainClass = '${group_id}.App'|" "$BUILD_GRADLE"
+    echo "  - Updated 'mainClass' for application plugin."
+  else
+    sed -i "/^application {/a\ \ \ \ mainClass = '${group_id}.App'" "$BUILD_GRADLE"
+    echo "  - Added 'mainClass' for application plugin (fallback)."
+  fi
 
-		#  Ensure Java version is set in the toolchain block
-		if grep -q "languageVersion = JavaLanguageVersion.of([0-9]\+)" "$BUILD_GRADLE"; then
-			sed -i "s|languageVersion = JavaLanguageVersion.of([0-9]\+)|languageVersion = JavaLanguageVersion.of(${java_version})|" "$BUILD_GRADLE"
-			echo "  - Verified/updated Java toolchain language version."
-		else
-			sed -i "/^java {/a\ \ \ \ toolchain {\n\ \ \ \ \ \ \ \ languageVersion = JavaLanguageVersion.of(${java_version})\n\ \ \ \ }" "$BUILD_GRADLE"
-			echo "  - Added Java toolchain configuration (fallback)."
-		fi
+  #  Ensure Java version is set in the toolchain block
+  if grep -q "languageVersion = JavaLanguageVersion.of([0-9]\+)" "$BUILD_GRADLE"; then
+    sed -i "s|languageVersion = JavaLanguageVersion.of([0-9]\+)|languageVersion = JavaLanguageVersion.of(${java_version})|" "$BUILD_GRADLE"
+    echo "  - Verified/updated Java toolchain language version."
+  else
+    sed -i "/^java {/a\ \ \ \ toolchain {\n\ \ \ \ \ \ \ \ languageVersion = JavaLanguageVersion.of(${java_version})\n\ \ \ \ }" "$BUILD_GRADLE"
+    echo "  - Added Java toolchain configuration (fallback)."
+  fi
 
-	else
-		echo "Error: 'build.gradle' not found after project generation in app/ directory. This is unexpected. ❌"
-		popd || exit # Pop from app/
-		popd || exit # Pop from project_root_dir
-		rm -rf "$project_root_dir"
-		return 1
-	fi
+else
+  echo "Error: 'build.gradle' not found after project generation in app/ directory. This is unexpected. ❌"
+  popd || exit # Pop from app/
+  popd || exit # Pop from project_root_dir
+  rm -rf "$project_root_dir"
+  return 1
+fi
 
-	# --- Pop back to the main project root directory ---
-	popd || exit # Back to $project_root_dir
+# --- Pop back to the main project root directory ---
+popd || exit # Back to $project_root_dir
 
-	# --- Generate a run.sh script for convenience ---
-	echo "Creating 'run.sh' script... "
-	cat <<EOF >run.sh
+# --- Generate a run.sh script for convenience ---
+echo "Creating 'run.sh' script... "
+cat <<EOF >run.sh
 #!/bin/bash
 # Builds and runs the Gradle application.
 echo "Building and running $project_name..."
 ./gradlew build && ./gradlew :app:run
 EOF
-	chmod +x run.sh
+chmod +x run.sh
 
-	# --- Generate a README.md file ---
-	echo "Creating 'README.md'... 📄"
-	local group_id_path=$(echo "$group_id" | sed 's/\./\//g')
-	cat <<EOF >README.md
+# --- Generate a README.md file ---
+echo "Creating 'README.md'... 📄"
+local group_id_path=$(echo "$group_id" | sed 's/\./\//g')
+cat <<EOF >README.md
 # $project_name
 
 This is a simple Java application built with Gradle.
@@ -689,29 +702,29 @@ To run the tests:
 
 EOF
 
-	# --- Return to the original directory where the script was invoked ---
-	popd || exit # Back to original_invoke_dir
+# --- Return to the original directory where the script was invoked ---
+popd || exit # Back to original_invoke_dir
 
-	echo -e "\n Gradle project '$project_name' created successfully at '$project_root_dir'!"
-	echo "To get started:"
-	echo "  cd '$project_root_dir'"
-	echo "  ./run.sh"
-	echo "Happy coding!"
-	return 0
+echo -e "\n Gradle project '$project_name' created successfully at '$project_root_dir'!"
+echo "To get started:"
+echo "  cd '$project_root_dir'"
+echo "  ./run.sh"
+echo "Happy coding!"
+return 0
 }
 
 # --- Main Script Logic ---
 
 if [ -z "$1" ]; then
-	echo "Usage: java-init <project_name>"
-	exit 1
+  echo "Usage: java-init <project_name>"
+  exit 1
 fi
 
 PROJECT_NAME=$1
 # For Maven, use the project name directly as artifactId if DEFAULT_ARTIFACT_ID_PREFIX is empty
 ARTIFACT_ID="${DEFAULT_ARTIFACT_ID_PREFIX}${PROJECT_NAME}"
 if [ -z "$ARTIFACT_ID" ]; then
-	ARTIFACT_ID="$PROJECT_NAME"
+  ARTIFACT_ID="$PROJECT_NAME"
 fi
 
 echo "--- Java Project Initializer ---"
@@ -726,17 +739,17 @@ echo "Enter choice (1 or 2 or 3):"
 read -r CHOICE
 
 case $CHOICE in
-1)
-	create_maven_project "$PROJECT_NAME" "$DEFAULT_GROUP_ID" "$ARTIFACT_ID" "$DEFAULT_VERSION" "$DEFAULT_JAVA_VERSION"
-	;;
-2)
-	create_ant_project "$PROJECT_NAME" "$DEFAULT_GROUP_ID" "$ARTIFACT_ID" "$DEFAULT_VERSION" "$DEFAULT_JAVA_VERSION"
-	;;
-3)
-	create_gradle_project "$PROJECT_NAME" "$DEFAULT_GROUP_ID" "$ARTIFACT_ID" "$DEFAULT_JAVA_VERSION"
-	;;
-*)
-	echo "Invalid choice. Exiting."
-	exit 1
-	;;
+  1)
+    create_maven_project "$PROJECT_NAME" "$DEFAULT_GROUP_ID" "$ARTIFACT_ID" "$DEFAULT_VERSION" "$DEFAULT_JAVA_VERSION"
+    ;;
+  2)
+    create_ant_project "$PROJECT_NAME" "$DEFAULT_GROUP_ID" "$ARTIFACT_ID" "$DEFAULT_VERSION" "$DEFAULT_JAVA_VERSION"
+    ;;
+  3)
+    create_gradle_project "$PROJECT_NAME" "$DEFAULT_GROUP_ID" "$ARTIFACT_ID" "$DEFAULT_JAVA_VERSION"
+    ;;
+  *)
+    echo "Invalid choice. Exiting."
+    exit 1
+    ;;
 esac
