@@ -15,12 +15,6 @@ create_ant_run_script() {
   local project_name=$2
   cat <<EOF >"$project_dir/run.sh"
 #!/bin/bash
-#
-# This script builds and runs the Ant project: $project_name
-#
-# Usage: ./run.sh
-#
-
 echo "Starting Ant build/run for: $project_name..."
 
 # Execute the Ant 'run' target.
@@ -165,182 +159,110 @@ create_maven_project() {
   local version=$4
   local java_version=$5
 
+  # --- Prompt for Shade ---
+  echo -n "Do you want to include the Maven Shade Plugin (fat JAR)? (y/n): "
+  read -r USE_SHADE
+
   echo "Building Maven project: '$project_name'..."
-  # ... (Display project variables) ...
 
-  local original_invoke_dir=$(pwd)
-  local project_root_dir="${original_invoke_dir}/${artifact_id}"
-
+  local project_root_dir="$(pwd)/${artifact_id}"
   mkdir -p "$project_root_dir"
-  pushd "$project_root_dir" || {
-    echo "Failed to enter project directory: $project_root_dir. Exiting."
-    exit 1
-  }
+  pushd "$project_root_dir" || exit 1
 
-  # Create source directories
   local base_java_path="src/main/java/$(echo "$group_id" | sed 's/\./\//g')"
-  local base_test_path="src/test/java/$(echo "$group_id" | sed 's/\./\//g')"
   mkdir -p "$base_java_path"
-  mkdir -p "$base_test_path"
+  mkdir -p "src/test/java/$(echo "$group_id" | sed 's/\./\//g')"
 
   # Create App.java
   cat <<EOF >"$base_java_path/App.java"
 package ${group_id};
-
 public class App {
     public static void main(String[] args) {
-	System.out.println("Hello from Maven project: ${artifact_id}!");
+        System.out.println("Hello from Maven project: ${artifact_id}!");
     }
 }
 EOF
 
-  # Create JUnit 5 test file (including Mockito import for setup)
-  cat <<EOF >"$base_test_path/AppTest.java"
-package ${group_id};
-
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*; // For Mockito
-
-class AppTest {
-    @Test
-    void shouldAnswerWithTrue() {
-	assertTrue(true);
-    }
-}
+  # Define the Shade Plugin block only if requested
+  SHADE_BLOCK=""
+  if [[ "$USE_SHADE" =~ ^[Yy]$ ]]; then
+    SHADE_BLOCK=$(
+      cat <<EOF
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.2</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>${group_id}.App</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 EOF
+    )
+  fi
 
-  # Create the pom.xml file with JUnit 5 and Mockito setup
+  # Generate pom.xml
   cat <<EOF >pom.xml
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>${group_id}</groupId>
     <artifactId>${artifact_id}</artifactId>
     <version>${version}</version>
-    <name>${project_name}</name>
-
     <properties>
-	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<maven.compiler.release>${java_version}</maven.compiler.release>
-	<junit.jupiter.version>5.10.0</junit.jupiter.version>
-	<mockito.version>5.10.0</mockito.version>
+        <maven.compiler.release>${java_version}</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-
-    <dependencies>
-	 <dependency>
-	    <groupId>org.apache.maven.plugins</groupId>
-	    <artifactId>maven-jar-plugin</artifactId>
-	    <version>3.4.2</version>
-	  </dependency>
-
-	<dependency>
-	    <groupId>org.junit.jupiter</groupId>
-	    <artifactId>junit-jupiter-api</artifactId>
-	    <version>\${junit.jupiter.version}</version>
-	    <scope>test</scope>
-	</dependency>
-	<dependency>
-	    <groupId>org.junit.jupiter</groupId>
-	    <artifactId>junit-jupiter-engine</artifactId>
-	    <version>\${junit.jupiter.version}</version>
-	    <scope>test</scope>
-	</dependency>
-
-	<dependency>
-	    <groupId>org.mockito</groupId>
-	    <artifactId>mockito-core</artifactId>
-	    <version>\${mockito.version}</version>
-	    <scope>test</scope>
-	</dependency>
-    </dependencies>
-
     <build>
-	<plugins>
-	    <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-compiler-plugin</artifactId>
-		<version>3.13.0</version>
-			<configuration>
-				<release>\${maven.compiler.release}</release>
-					</configuration>
-	    </plugin>
-
-	    <plugin>
-		<groupId>org.codehaus.mojo</groupId>
-		<artifactId>exec-maven-plugin</artifactId>
-		<version>3.1.0</version>
-		<configuration>
-		    <mainClass>${group_id}.App</mainClass>
-		</configuration>
-	    </plugin>
-
-	    <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-jar-plugin</artifactId>
-		<version>3.3.0</version>
-		<configuration>
-		    <archive>
-			<manifest>
-			    <addClasspath>true</addClasspath>
-			    <classpathPrefix>lib/</classpathPrefix>
-			    <mainClass>${group_id}.App</mainClass>
-			</manifest>
-		    </archive>
-		</configuration>
-	    </plugin>
-						<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-shade-plugin</artifactId>
-	<version>3.5.1</version>
-	<executions>
-	  <execution>
-	    <phase>package</phase>
-	    <goals>
-	      <goal>shade</goal>
-	    </goals>
-	    <configuration>
-	      <shadedArtifactAttached>true</shadedArtifactAttached>
-	      <shadedClassifierName>jar-with-dependencies</shadedClassifierName>
-	      <transformers>
-		<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-		  <mainClass>${group_id}.App</mainClass>
-		</transformer>
-	      </transformers>
-	      <filters>
-		<filter>
-		  <artifact>*:*</artifact>
-		  <excludes>
-		    <exclude>META-INF/*.SF</exclude>
-		    <exclude>META-INF/*.DSA</exclude>
-		    <exclude>META-INF/*.RSA</exclude>
-		  </excludes>
-		</filter>
-	      </filters>
-	    </configuration>
-		     </execution>
-		     </executions>
-		      </plugin>
-		<plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-surefire-plugin</artifactId>
-			<version>3.2.5</version>
-		      </plugin>
-	</plugins>
+        <plugins>
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-surefire-plugin</artifactId>
+               <version>3.2.5</version>
+           </plugin>
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-jar-plugin</artifactId>
+               <version>3.3.0</version>
+          </plugin>
+          <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <mainClass>${group_id}.App</mainClass>
+                </configuration>
+            </plugin>
+            $SHADE_BLOCK
+        </plugins>
     </build>
 </project>
 EOF
 
-  # Create run.sh and README.md
-  create_maven_run_script "$(pwd)" "$project_name"
-  create_maven_readme "$(pwd)" "$project_name"
+  # Generate run.sh with warning suppression
+  cat <<EOF >run.sh
+#!/bin/bash
+mvn clean package exec:java
+EOF
+  chmod +x run.sh
 
   popd || exit
-
-  echo -e "\nMaven project '$project_name' created successfully!"
-  echo "Happy coding!"
+  echo "Maven project created at $project_root_dir"
 }
 
 create_ant_project() {
@@ -370,8 +292,8 @@ create_ant_project() {
   cat <<EOF >src/main/java/App.java
 public class App {
 	/**
-	 * @author Yahm3 
-	 */	
+	 * @author Yahm3
+	 */
 	public static void main(String[] args) {
 		System.out.println("Hello from Ant project: $project_name!");
 	}
@@ -528,192 +450,6 @@ EOF
   echo -e "\nAnt project '$project_name' created successfully (Ivy: ${USE_IVY:-n})!"
 }
 
-create_gradle_project() {
-  local project_name="$1"
-  local group_id="$2"
-  local artifact_id="$3"
-  local java_version="$4"
-
-  # --- Argument Validation ---
-  if [ -z "$project_name" ] || [ -z "$group_id" ] || [ -z "$artifact_id" ] || [ -z "$java_version" ]; then
-    echo "Error: All arguments (project_name, group_id, artifact_id, java_version) are required."
-    echo "Usage: create_gradle_project \"Project Name\" \"com.example.package\" \"artifact-id\" \"25\""
-    return 1
-  fi
-
-  echo "🚀 Building Gradle project: '$project_name'..."
-  echo "  Group ID: $group_id"
-  echo "  Artifact ID: $artifact_id"
-  echo "  Java Version: $java_version"
-
-  local original_invoke_dir=$(pwd)
-  local project_root_dir="${original_invoke_dir}/${artifact_id}"
-  local app_sub_dir="app" # The subdirectory where the application's build.gradle will be
-
-  if [ -d "$project_root_dir" ]; then
-    echo "Error: Project directory '$project_root_dir' already exists. Aborting. ❌"
-    return 1
-  fi
-
-  echo "Creating project directory: '$project_root_dir'..."
-  mkdir -p "$project_root_dir" || {
-    echo "Error: Failed to create project directory '$project_root_dir'. ❌"
-    return 1
-  }
-  pushd "$project_root_dir" || {
-    echo "Error: Failed to enter project directory '$project_root_dir'. ❌"
-    return 1
-  }
-
-  echo "Running 'gradle init' to scaffold the project... (Piping inputs for non-interactive mode)"
-
-  (
-    echo "1"
-    echo "y"
-  ) | gradle init \
-    --type java-application \
-    --dsl groovy \
-    --test-framework junit-jupiter \
-    --package "$group_id" \
-    --project-name "$artifact_id" \
-    --java-version "$java_version"
-
-  if [ $? -ne 0 ]; then
-    echo "Error: 'gradle init' failed to generate the project. Cleaning up. ❌"
-    popd || exit
-    rm -rf "$project_root_dir"
-    return 1
-  fi
-
-  echo "--- Files created by 'gradle init' in $(pwd): ---"
-  ls -F
-  echo "-------------------------------------"
-
-  # --- change into the 'app' subdirectory to modify its build.gradle ---
-  echo "Navigating to '$app_sub_dir' directory to customize 'build.gradle'..."
-  pushd "$app_sub_dir" || {
-    echo "Critical Error: '$app_sub_dir' subdirectory not found. This is unexpected. ❌"
-    popd || exit # Pop from project_root_dir
-    rm -rf "$project_root_dir"
-    return 1
-  }
-
-  local BUILD_GRADLE="build.gradle"
-  local APP_JAVA_PATH="src/main/java/$(echo "$group_id" | sed 's/\./\//g')/App.java"
-  local APP_TEST_PATH="src/test/java/$(echo "$group_id" | sed 's/\./\//g')/AppTest.java" # This path is relative to app/
-
-  # --- Check for build.gradle AFTER init in the 'app' subdir ---
-  if [ ! -f "$BUILD_GRADLE" ]; then
-    echo "Critical Error: '$BUILD_GRADLE' not found in '$(pwd)' after successful 'gradle init'. This is unexpected. ❌"
-    popd || exit # Pop from app/
-    popd || exit # Pop from project_root_dir
-    rm -rf "$project_root_dir"
-    return 1
-  fi
-
-  echo "Customizing 'build.gradle' for Mockito and application plugin configuration... 🛠️"
-  # --- Modify build.gradle ---
-  if [ -f "$BUILD_GRADLE" ]; then
-    # 1. Add Mockito dependency (using latest stable Mockito 5.x)
-    sed -i "/testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'/a\ \ \ \ testImplementation 'org.mockito:mockito-core:5.10.0'" "$BUILD_GRADLE"
-    echo "  - Added Mockito dependency."
-
-    #  Ensure application plugin is configured with mainClass
-    if grep -q "mainClass =" "$BUILD_GRADLE"; then
-      sed -i "s|mainClass = '.*'|mainClass = '${group_id}.App'|" "$BUILD_GRADLE"
-      echo "  - Updated 'mainClass' for application plugin."
-    else
-      sed -i "/^application {/a\ \ \ \ mainClass = '${group_id}.App'" "$BUILD_GRADLE"
-      echo "  - Added 'mainClass' for application plugin (fallback)."
-    fi
-
-    #  Ensure Java version is set in the toolchain block
-    if grep -q "languageVersion = JavaLanguageVersion.of([0-9]\+)" "$BUILD_GRADLE"; then
-      sed -i "s|languageVersion = JavaLanguageVersion.of([0-9]\+)|languageVersion = JavaLanguageVersion.of(${java_version})|" "$BUILD_GRADLE"
-      echo "  - Verified/updated Java toolchain language version."
-    else
-      sed -i "/^java {/a\ \ \ \ toolchain {\n\ \ \ \ \ \ \ \ languageVersion = JavaLanguageVersion.of(${java_version})\n\ \ \ \ }" "$BUILD_GRADLE"
-      echo "  - Added Java toolchain configuration (fallback)."
-    fi
-
-  else
-    echo "Error: 'build.gradle' not found after project generation in app/ directory. This is unexpected. ❌"
-    popd || exit # Pop from app/
-    popd || exit # Pop from project_root_dir
-    rm -rf "$project_root_dir"
-    return 1
-  fi
-
-  # --- Pop back to the main project root directory ---
-  popd || exit # Back to $project_root_dir
-
-  # --- Generate a run.sh script for convenience ---
-  echo "Creating 'run.sh' script... "
-  cat <<EOF >run.sh
-#!/bin/bash
-# Builds and runs the Gradle application.
-echo "Building and running $project_name..."
-./gradlew build && ./gradlew :app:run
-EOF
-  chmod +x run.sh
-
-  # --- Generate a README.md file ---
-  echo "Creating 'README.md'... 📄"
-  local group_id_path=$(echo "$group_id" | sed 's/\./\//g')
-  cat <<EOF >README.md
-# $project_name
-
-This is a simple Java application built with Gradle.
-
-## Project Structure
-\`\`\`
-.
-├── gradle/
-├── app/
-│   ├── build.gradle
-│   └── src/
-│       ├── main/
-│       │   └── java/
-│       │       └── ${group_id_path}/
-│       │           └── App.java
-│       └── test/
-│           └── java/
-│               └── ${group_id_path}/
-│                   └── AppTest.java
-├── settings.gradle
-├── gradlew
-├── gradlew.bat
-├── README.md
-└── run.sh
-\`\`\`
-
-## Build and Run
-
-To build and run the application from the project root:
-\`\`\`bash
-./run.sh
-\`\`\`
-
-## Testing
-
-To run the tests:
-\`\`\`bash
-./gradlew test
-\`\`\`
-
-EOF
-
-  # --- Return to the original directory where the script was invoked ---
-  popd || exit # Back to original_invoke_dir
-
-  echo -e "\n Gradle project '$project_name' created successfully at '$project_root_dir'!"
-  echo "To get started:"
-  echo "  cd '$project_root_dir'"
-  echo "  ./run.sh"
-  echo "Happy coding!"
-  return 0
-}
-
 # --- Main Script Logic ---
 
 if [ -z "$1" ]; then
@@ -734,8 +470,7 @@ echo ""
 echo "Choose a build system:"
 echo "  1. Maven"
 echo "  2. Ant"
-echo "  3. Gradle"
-echo "Enter choice (1 or 2 or 3):"
+echo "Enter choice (1 or 2):"
 
 read -r CHOICE
 
@@ -745,9 +480,6 @@ case $CHOICE in
   ;;
 2)
   create_ant_project "$PROJECT_NAME" "$DEFAULT_GROUP_ID" "$ARTIFACT_ID" "$DEFAULT_VERSION" "$DEFAULT_JAVA_VERSION"
-  ;;
-3)
-  create_gradle_project "$PROJECT_NAME" "$DEFAULT_GROUP_ID" "$ARTIFACT_ID" "$DEFAULT_JAVA_VERSION"
   ;;
 *)
   echo "Invalid choice. Exiting."
